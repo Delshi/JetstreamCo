@@ -3209,3 +3209,112 @@ REVOKE EXECUTE ON PROCEDURE add_employee_proc(
     phone varchar,
     OUT new_employee_id integer
 ) FROM sales_manager, client, auditor, partner;
+
+
+
+
+--RLS
+
+ALTER TABLE Contract ENABLE ROW LEVEL SECURITY;
+ALTER TABLE Client ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ClientDocuments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE MainPassesCli ENABLE ROW LEVEL SECURITY;
+ALTER TABLE InterPassesCli ENABLE ROW LEVEL SECURITY;
+ALTER TABLE SnilsCli ENABLE ROW LEVEL SECURITY;
+ALTER TABLE InnCli ENABLE ROW LEVEL SECURITY;
+ALTER TABLE Employee ENABLE ROW LEVEL SECURITY;
+ALTER TABLE EmployeeDocuments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE PassesEmp ENABLE ROW LEVEL SECURITY;
+ALTER TABLE SnilsEmp ENABLE ROW LEVEL SECURITY;
+ALTER TABLE InnEmp ENABLE ROW LEVEL SECURITY;
+ALTER TABLE WrkBooksEmp ENABLE ROW LEVEL SECURITY;
+ALTER TABLE EmpRole ENABLE ROW LEVEL SECURITY;
+ALTER TABLE Partner ENABLE ROW LEVEL SECURITY;
+ALTER TABLE PartnerContacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE PartnerOrgTypes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE AdditionalService ENABLE ROW LEVEL SECURITY;
+ALTER TABLE Tariff ENABLE ROW LEVEL SECURITY;
+ALTER TABLE TariffDetails ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY client_select ON Client FOR SELECT TO client USING (CliID = current_setting('app.current_client_id')::INTEGER);
+CREATE POLICY client_update ON Client FOR UPDATE TO client USING (CliID = current_setting('app.current_client_id')::INTEGER);
+CREATE POLICY client_insert ON Client FOR INSERT TO client WITH CHECK (CliID = current_setting('app.current_client_id')::INTEGER);
+
+CREATE POLICY client_documents_select ON ClientDocuments FOR SELECT TO client USING (ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER));
+CREATE POLICY client_documents_update ON ClientDocuments FOR UPDATE TO client USING (ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER));
+CREATE POLICY client_documents_insert ON ClientDocuments FOR INSERT TO client WITH CHECK (ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER));
+
+CREATE POLICY main_passes_cli_select ON MainPassesCli FOR SELECT TO client USING (MainPassCliID = (SELECT MainPassCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY main_passes_cli_update ON MainPassesCli FOR UPDATE TO client USING (MainPassCliID = (SELECT MainPassCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY main_passes_cli_insert ON MainPassesCli FOR INSERT TO client WITH CHECK (MainPassCliID = (SELECT MainPassCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+
+CREATE POLICY inter_passes_cli_select ON InterPassesCli FOR SELECT TO client USING (InterPassCliID = (SELECT InterPassCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY inter_passes_cli_update ON InterPassesCli FOR UPDATE TO client USING (InterPassCliID = (SELECT InterPassCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY inter_passes_cli_insert ON InterPassesCli FOR INSERT TO client WITH CHECK (InterPassCliID = (SELECT InterPassCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+
+CREATE POLICY snils_cli_select ON SnilsCli FOR SELECT TO client USING (SnilsCliID = (SELECT SnilsCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY snils_cli_update ON SnilsCli FOR UPDATE TO client USING (SnilsCliID = (SELECT SnilsCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY snils_cli_insert ON SnilsCli FOR INSERT TO client WITH CHECK (SnilsCliID = (SELECT SnilsCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+
+CREATE POLICY inn_cli_select ON InnCli FOR SELECT TO client USING (InnCliID = (SELECT InnCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY inn_cli_update ON InnCli FOR UPDATE TO client USING (InnCliID = (SELECT InnCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+CREATE POLICY inn_cli_insert ON InnCli FOR INSERT TO client WITH CHECK (InnCliID = (SELECT InnCliID FROM ClientDocuments WHERE ClientDocumentsID = (SELECT ClientDocumentsID FROM Client WHERE CliID = current_setting('app.current_client_id')::INTEGER)));
+
+CREATE POLICY contract_select ON Contract FOR SELECT TO client USING (CliID = current_setting('app.current_client_id')::INTEGER);
+CREATE POLICY contract_select ON Contract FOR SELECT TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY contract_select ON Contract FOR SELECT TO sales_manager USING (TRUE);
+CREATE POLICY contract_select ON Contract FOR SELECT TO accountant USING (TRUE);
+CREATE POLICY contract_select ON Contract FOR SELECT TO auditor USING (TRUE);
+
+CREATE POLICY partner_select ON Partner FOR SELECT TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY partner_update ON Partner FOR UPDATE TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY partner_insert ON Partner FOR INSERT TO partner WITH CHECK (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+
+CREATE POLICY partner_contacts_select ON PartnerContacts FOR SELECT TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY partner_contacts_update ON PartnerContacts FOR UPDATE TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY partner_contacts_insert ON PartnerContacts FOR INSERT TO partner WITH CHECK (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+
+CREATE POLICY additional_service_select ON AdditionalService FOR SELECT TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY additional_service_update ON AdditionalService FOR UPDATE TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY additional_service_insert ON AdditionalService FOR INSERT TO partner WITH CHECK (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+
+CREATE POLICY tariff_select ON Tariff FOR SELECT TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY tariff_update ON Tariff FOR UPDATE TO partner USING (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+CREATE POLICY tariff_insert ON Tariff FOR INSERT TO partner WITH CHECK (PartnerID = current_setting('app.current_partner_id')::INTEGER);
+
+CREATE POLICY tariff_details_select ON TariffDetails FOR SELECT TO partner USING (TariffDetailID IN (SELECT TariffDetailID FROM Tariff WHERE PartnerID = current_setting('app.current_partner_id')::INTEGER));
+CREATE POLICY tariff_details_select ON TariffDetails FOR SELECT TO sales_manager USING (TRUE);
+CREATE POLICY tariff_details_select ON TariffDetails FOR SELECT TO accountant USING (TRUE);
+CREATE POLICY tariff_details_select ON TariffDetails FOR SELECT TO auditor USING (TRUE);
+
+CREATE POLICY employee_select ON Employee FOR SELECT TO accountant USING (TRUE);
+CREATE POLICY employee_update ON Employee FOR UPDATE TO accountant USING (TRUE);
+CREATE POLICY employee_insert ON Employee FOR INSERT TO accountant WITH CHECK (TRUE);
+
+CREATE POLICY employee_documents_select ON EmployeeDocuments FOR SELECT TO accountant USING (EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee));
+CREATE POLICY employee_documents_update ON EmployeeDocuments FOR UPDATE TO accountant USING (EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee));
+CREATE POLICY employee_documents_insert ON EmployeeDocuments FOR INSERT TO accountant WITH CHECK (EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee));
+
+CREATE POLICY passes_emp_select ON PassesEmp FOR SELECT TO accountant USING (PassEmpID IN (SELECT PassEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY passes_emp_update ON PassesEmp FOR UPDATE TO accountant USING (PassEmpID IN (SELECT PassEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY passes_emp_insert ON PassesEmp FOR INSERT TO accountant WITH CHECK (PassEmpID IN (SELECT PassEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+
+CREATE POLICY snils_emp_select ON SnilsEmp FOR SELECT TO accountant USING (SnilsEmpID IN (SELECT SnilsEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY snils_emp_update ON SnilsEmp FOR UPDATE TO accountant USING (SnilsEmpID IN (SELECT SnilsEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY snils_emp_insert ON SnilsEmp FOR INSERT TO accountant WITH CHECK (SnilsEmpID IN (SELECT SnilsEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+
+CREATE POLICY inn_emp_select ON InnEmp FOR SELECT TO accountant USING (InnEmpID IN (SELECT InnEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY inn_emp_update ON InnEmp FOR UPDATE TO accountant USING (InnEmpID IN (SELECT InnEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY inn_emp_insert ON InnEmp FOR INSERT TO accountant WITH CHECK (InnEmpID IN (SELECT InnEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+
+CREATE POLICY wrk_books_emp_select ON WrkBooksEmp FOR SELECT TO accountant USING (WrkEmpID IN (SELECT WrkEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY wrk_books_emp_update ON WrkBooksEmp FOR UPDATE TO accountant USING (WrkEmpID IN (SELECT WrkEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+CREATE POLICY wrk_books_emp_insert ON WrkBooksEmp FOR INSERT TO accountant WITH CHECK (WrkEmpID IN (SELECT WrkEmpID FROM EmployeeDocuments WHERE EmployeeDocumentsID IN (SELECT EmployeeDocumentsID FROM Employee)));
+
+CREATE POLICY emp_role_select ON EmpRole FOR SELECT TO accountant USING (TRUE);
+CREATE POLICY emp_role_update ON EmpRole FOR UPDATE TO accountant USING (TRUE);
+CREATE POLICY emp_role_insert ON EmpRole FOR INSERT TO accountant WITH CHECK (TRUE);
+
+CREATE POLICY partner_org_types_select ON PartnerOrgTypes FOR SELECT TO accountant USING (TRUE);
+CREATE POLICY partner_org_types_update ON PartnerOrgTypes FOR UPDATE TO accountant USING (TRUE);
+CREATE POLICY partner_org_types_insert ON PartnerOrgTypes FOR INSERT TO accountant WITH CHECK (TRUE);
